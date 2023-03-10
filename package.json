@@ -9,5 +9,8 @@
   "scripts": {
     "test": "node index.js",
     "build": "tsc -p tsconfig.lib.json"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.1"
   }
 }
