@@ -14,10 +14,7 @@ export class SeedClipper {
         return passData
     }
 
-    // Encrypt a text string using a password
-    async encryptText(text: string, password: string): Promise<string> {
-
-        const data = this.encoder.encode(text);
+    async encryptData(data: Uint8Array, password: string): Promise<string> {
         const algorithm = {name: this.algorithm, length: 256};
         const key = await crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['encrypt']);
         const iv = crypto.getRandomValues(new Uint8Array(16));
@@ -29,20 +26,34 @@ export class SeedClipper {
         return Array.prototype.map.call(buffer, x => ('00' + x.toString(16)).slice(-2)).join('');
     }
 
+    // Encrypt a text string using a password
+    async encryptText(text: string, password: string): Promise<string> {
+        const data = this.encoder.encode(text);
+
+        return this.encryptData(data, password)
+    }
+
+
+
 // Decrypt an encrypted text string using a password
     async decryptText(encryptedText: string, password: string): Promise<string> {
+        const data=await this.decryptData(encryptedText, password);
+        const decoder = new TextDecoder();
+        const decryptedText = decoder.decode(data);
+
+        return decryptedText;
+    }
+
+    async decryptData(encryptedText: string, password: string): Promise<Uint8Array> {
         const algorithm = {name: this.algorithm, length: 256};
-        const key = await crypto.subtle.importKey('raw',  this.getPassData(password), algorithm, false, ['decrypt']);
+        const key = await crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['decrypt']);
         // @ts-ignore
         const buffer = new Uint8Array(encryptedText.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)));
         const iv = buffer.slice(0, 16);
         const encryptedData = buffer.slice(16);
         const decryptedData = await crypto.subtle.decrypt({name: this.algorithm, iv}, key, encryptedData);
 
-        const decoder = new TextDecoder();
-        const decryptedText = decoder.decode(decryptedData);
-
-        return decryptedText;
+        return new Uint8Array(decryptedData) ;
     }
 
 }
