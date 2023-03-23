@@ -1,7 +1,7 @@
 import * as jose from 'jose'
 import * as bip39 from 'bip39'
 import * as secp256k1 from "secp256k1";
-import { sha256 } from "crypto-hash";
+import {sha256} from "crypto-hash";
 
 
 export function generateMnemonic() {
@@ -27,12 +27,6 @@ export async function generatePublicKeyPrivate(privateKey: Uint8Array): Promise<
 }
 
 
-export async function  genHash(password: string, login: string){
-    const hash = crypto.subtle.digest('SHA-256', new TextEncoder().encode(password + login));
-    const hexHash = Array.from(new Uint8Array(await hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-    return hexHash;
-}
-
 
 
 export async function genJwt(payload: any, secret: Uint8Array,expTime:string): Promise<string> {
@@ -47,5 +41,10 @@ export async function genJwt(payload: any, secret: Uint8Array,expTime:string): P
         .sign(secret)
 
     return jwt
+}
+
+
+export async function decodeJwt(token: string): Promise<any> {
+    return jose.decodeJwt(token)
 }
 
