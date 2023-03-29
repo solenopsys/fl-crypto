@@ -1,9 +1,12 @@
+
+
 export class SeedClipper {
     encoder = new TextEncoder();
+    decoder = new TextDecoder();
+    crypto = new Crypto();
 
-    constructor(
-        private algorithm: string,
-    ) {
+
+    constructor(private algorithm: string) {
     }
 
     getPassData(password: string): Uint8Array {
@@ -14,11 +17,11 @@ export class SeedClipper {
         return passData
     }
 
-    async encryptData(data: Uint8Array, password: string): Promise<string> {
+    async encryptData(data: Uint8Array, password: string): Promise<string> { // todo add salt
         const algorithm = {name: this.algorithm, length: 256};
-        const key = await crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['encrypt']);
-        const iv = crypto.getRandomValues(new Uint8Array(16));
-        const encryptedData = await crypto.subtle.encrypt({name: this.algorithm, iv}, key, data);
+        const key = await this.crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['encrypt']);
+        const iv = this.crypto.getRandomValues(new Uint8Array(16));
+        const encryptedData = await this.crypto.subtle.encrypt({name: this.algorithm, iv}, key, data);
 
         const buffer = new Uint8Array(iv.byteLength + encryptedData.byteLength);
         buffer.set(iv, 0);
@@ -34,26 +37,29 @@ export class SeedClipper {
     }
 
 
-
 // Decrypt an encrypted text string using a password
     async decryptText(encryptedText: string, password: string): Promise<string> {
-        const data=await this.decryptData(encryptedText, password);
-        const decoder = new TextDecoder();
-        const decryptedText = decoder.decode(data);
+        const data = await this.decryptData(encryptedText, password);
+
+        const decryptedText = this.decoder.decode(data);
 
         return decryptedText;
     }
 
     async decryptData(encryptedText: string, password: string): Promise<Uint8Array> {
         const algorithm = {name: this.algorithm, length: 256};
-        const key = await crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['decrypt']);
+        const key = await this.crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['decrypt']);
+
         // @ts-ignore
         const buffer = new Uint8Array(encryptedText.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)));
         const iv = buffer.slice(0, 16);
         const encryptedData = buffer.slice(16);
-        const decryptedData = await crypto.subtle.decrypt({name: this.algorithm, iv}, key, encryptedData);
+        const decryptedData = await this.crypto.subtle.decrypt({
+            name: this.algorithm,
+            iv
+        }, key, encryptedData);
 
-        return new Uint8Array(decryptedData) ;
+        return new Uint8Array(decryptedData);
     }
 
 }
