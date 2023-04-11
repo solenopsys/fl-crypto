@@ -13,6 +13,8 @@ export class CryptoTools{
     async privateKeyFromSeed(seedPhrase: string): Promise<Uint8Array> {
         const hash:ArrayBuffer = await sha256( this.encoder.encode(seedPhrase) );
         const privateKey = new Uint8Array(hash.slice(0, 32));
+        const hexHash = Array.from(new Uint8Array( hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+        console.log("HASH",hexHash)
         while (!secp256k1.privateKeyVerify(privateKey)) {
             const reHash = await sha256(new Uint8Array(hash));
             privateKey.set( new Uint8Array(reHash.slice(0, 32)));
