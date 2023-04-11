@@ -1,7 +1,5 @@
-import {CryptoTools, generateMnemonic} from "./crypto-tools";
+import {CryptoTools} from "./crypto-tools";
 
-import * as paseto from 'paseto';
-import {sha256} from "@cosmjs/crypto";
 import {createToken, readToken} from "./tokens";
 import * as moment from "moment";
 

@@ -7,8 +7,6 @@ import {sha256} from "@cosmjs/crypto";
 
 export class CryptoTools{
     encoder = new TextEncoder();
-    constructor() {
-    }
 
     async privateKeyFromSeed(seedPhrase: string): Promise<Uint8Array> {
         const hash:ArrayBuffer = await sha256( this.encoder.encode(seedPhrase) );
