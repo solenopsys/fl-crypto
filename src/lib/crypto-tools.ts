@@ -1,8 +1,8 @@
-import * as bip39 from 'bip39'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as secp256k1 from 'secp256k1';
 import {sha256} from "@cosmjs/crypto";
+import {entropyToMnemonic} from "@cosmjs/crypto/build/bip39";
 
 
 export class CryptoTools{
@@ -25,5 +25,7 @@ export class CryptoTools{
     }
 }
 export function generateMnemonic() {
-    return bip39.generateMnemonic();
+    const entropy =new Uint8Array(32)
+    window.crypto.getRandomValues(entropy);
+    return   entropyToMnemonic(entropy)
 }

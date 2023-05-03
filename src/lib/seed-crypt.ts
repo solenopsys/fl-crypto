@@ -1,12 +1,10 @@
-
-
 export class SeedClipper {
     encoder = new TextEncoder();
     decoder = new TextDecoder();
-    crypto = new Crypto();
 
 
-    constructor(private algorithm: string) {
+    constructor(private algorithm: string, private crypto: Crypto ) {
+
     }
 
     getPassData(password: string): Uint8Array {
