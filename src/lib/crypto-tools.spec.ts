@@ -1,8 +1,12 @@
 import {CryptoTools, generateMnemonic} from "./crypto-tools";
-import {sha256} from "@cosmjs/crypto";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as secp256k1 from 'secp256k1';
+import {CryptoWrapper} from "./crypto-wrapper";
+
+
+
+const cw = new CryptoWrapper(new Crypto());
 
 
 describe('Crypto Tools', () => {
@@ -17,7 +21,7 @@ describe('Crypto Tools', () => {
     });
 
     it('should generate private key', async () => {
-        const ct= new CryptoTools();
+        const ct= new CryptoTools(cw);
         const privateKey = await ct.privateKeyFromSeed("bachelor spy list giggle velvet adjust impulse weasel blush grant hole concert");
         expect(privateKey.buffer.byteLength).toBe(32);
         const hex = Buffer.from(privateKey).toString('hex');
@@ -25,7 +29,7 @@ describe('Crypto Tools', () => {
     });
 
     it('should generate public key', async () => {
-        const ct= new CryptoTools();
+        const ct= new CryptoTools(cw);
         const privateKey = await ct.privateKeyFromSeed("bachelor spy list giggle velvet adjust impulse weasel blush grant hole concert");
         const publicKey =await ct.publicKeyFromPrivateKey(privateKey)
         expect(publicKey.buffer.byteLength).toBe(33);
@@ -34,11 +38,11 @@ describe('Crypto Tools', () => {
     });
 
     it('should sing and verify', async () => {
-        const ct= new CryptoTools();
+        const ct= new CryptoTools(cw);
         const privateKey = await ct.privateKeyFromSeed("bachelor spy list giggle velvet adjust impulse weasel blush grant hole concert");
         const publicKey =await ct.publicKeyFromPrivateKey(privateKey)
         const message = "Hello World";
-        const messageHash = await sha256( ct.encoder.encode(message) );
+        const messageHash = await cw.sha256( ct.encoder.encode(message) );
         const signature = secp256k1.ecdsaSign(messageHash, privateKey);
         const verified = secp256k1.ecdsaVerify(signature.signature, messageHash, publicKey);
         expect(verified).toBeTruthy();

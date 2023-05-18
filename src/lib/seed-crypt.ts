@@ -1,9 +1,11 @@
+import {CryptoWrapper} from "./crypto-wrapper";
+
 export class SeedClipper {
     encoder = new TextEncoder();
     decoder = new TextDecoder();
 
 
-    constructor(private algorithm: string, private crypto: Crypto ) {
+    constructor(private algorithm: string, private cryptoWrapper: CryptoWrapper) {
 
     }
 
@@ -17,9 +19,9 @@ export class SeedClipper {
 
     async encryptData(data: Uint8Array, password: string): Promise<string> { // todo add salt
         const algorithm = {name: this.algorithm, length: 256};
-        const key = await this.crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['encrypt']);
-        const iv = this.crypto.getRandomValues(new Uint8Array(16));
-        const encryptedData = await this.crypto.subtle.encrypt({name: this.algorithm, iv}, key, data);
+        const key = await this.cryptoWrapper.crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['encrypt']);
+        const iv = await this.cryptoWrapper.crypto.getRandomValues(new Uint8Array(16));
+        const encryptedData = await this.cryptoWrapper.crypto.subtle.encrypt({name: this.algorithm, iv}, key, data);
 
         const buffer = new Uint8Array(iv.byteLength + encryptedData.byteLength);
         buffer.set(iv, 0);
@@ -46,13 +48,13 @@ export class SeedClipper {
 
     async decryptData(encryptedText: string, password: string): Promise<Uint8Array> {
         const algorithm = {name: this.algorithm, length: 256};
-        const key = await this.crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['decrypt']);
+        const key = await this.cryptoWrapper.crypto.subtle.importKey('raw', this.getPassData(password), algorithm, false, ['decrypt']);
 
         // @ts-ignore
         const buffer = new Uint8Array(encryptedText.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)));
         const iv = buffer.slice(0, 16);
         const encryptedData = buffer.slice(16);
-        const decryptedData = await this.crypto.subtle.decrypt({
+        const decryptedData = await this.cryptoWrapper.crypto.subtle.decrypt({
             name: this.algorithm,
             iv
         }, key, encryptedData);
