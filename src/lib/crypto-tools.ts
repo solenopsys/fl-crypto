@@ -31,9 +31,16 @@ export class CryptoTools {
     }
 }
 
+import { Buffer } from 'buffer';
+
+
+
 export function generateMnemonic() {
     const entropy = new Uint8Array(32)
+
     window.crypto.getRandomValues(entropy);
     const stringEntropy = buf2hex(entropy);
+    // Create a global Buffer object
+
     return entropyToMnemonic(stringEntropy)
 }
