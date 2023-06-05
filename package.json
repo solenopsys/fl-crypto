@@ -11,6 +11,6 @@
     "@peculiar/webcrypto": "^1.4.3"
   },
   "scripts": {
-    "build": "ng-packagr -p ng-package.json -c ../../../../tsconfig.base.json"
+    "build": "ng-packagr -p ng-package.json -c ../../../../tsconfig.packages.json"
   }
 }
