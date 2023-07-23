@@ -11,6 +11,6 @@
     "@peculiar/webcrypto": "^1.4.3"
   },
   "scripts": {
-    "build": "xs-pack"
+    "build": "ng-packagr -p xs-package.json -c ../../../../tsconfig.packages.json"
   }
 }
