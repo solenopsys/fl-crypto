@@ -36,11 +36,13 @@ import { Buffer } from 'buffer';
 
 
 export function generateMnemonic() {
+    // @ts-ignore
+    window.Buffer = Buffer;
     const entropy = new Uint8Array(32)
 
     window.crypto.getRandomValues(entropy);
     const stringEntropy = buf2hex(entropy);
-    // Create a global Buffer object
+
 
     return entropyToMnemonic(stringEntropy)
 }
