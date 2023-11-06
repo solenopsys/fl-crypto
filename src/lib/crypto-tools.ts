@@ -33,10 +33,8 @@ export class CryptoTools {
 
 import { Buffer } from 'buffer';
 
-
-
 export function generateMnemonic() {
-    // @ts-ignore
+
     window.Buffer = Buffer;
     const entropy = new Uint8Array(32)
 
